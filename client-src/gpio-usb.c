@@ -83,19 +83,19 @@ int digitalwrite(int pin,int data)
 
 static void usage(char *name)
 {
-    fprintf(stderr, "Пример работы с сайта http://homes-smart.ru/\n");
-    fprintf(stderr, "Версия gpio-usb 1.0 от 10.09.13\n");
+    fprintf(stderr, "Example from http://homes-smart.ru/\n");
+    fprintf(stderr, "Version gpio-usb 1.0 date 10.09.13\n");
     fprintf(stderr, "usage:\n");
-    fprintf(stderr, "  %s on <номер GPIO>...Включить порт\n", name);
-    fprintf(stderr, "  %s off <номер GPIO>..Выключить порт\n", name);
-    fprintf(stderr, "  %s mode .............Управление режимом порта\n", name);
-    fprintf(stderr, "  %s status .......... Просмотр статуса GPIO на вывод\n", name);
-    fprintf(stderr, "  %s statusin ... .....Просмотр статуса GPIO на ввод\n", name);
-    fprintf(stderr, "  %s pwm3 <level>......Управление ШИМ на 3 GPIO\n", name);
-    fprintf(stderr, "  %s pwm4 <level>......Управление ШИМ на 4 GPIO\n", name);
-    fprintf(stderr, "  %s rcsend <key>......Отправить ключ RCremote\n", name);
-    fprintf(stderr, "  %s dhtread...........Чтение датчика DHT11 или DHT22\n", name);
-    fprintf(stderr, "  %s dhtsetup..........Запрос статуса и вкл/выкл датчиков DHT\n", name);
+    fprintf(stderr, "  %s on <GPIO number>...Port on\n", name);
+    fprintf(stderr, "  %s off <GPIO number>..Port off\n", name);
+    fprintf(stderr, "  %s mode .............Manage port mode\n", name);
+    fprintf(stderr, "  %s status .......... Show status of GPIO output\n", name);
+    fprintf(stderr, "  %s statusin ... .....Show status of GPIO input\n", name);
+    fprintf(stderr, "  %s pwm3 <level>......Manage PWM on 3 GPIO\n", name);
+    fprintf(stderr, "  %s pwm4 <level>......Manage PWM on 4 GPIO\n", name);
+    fprintf(stderr, "  %s rcsend <key>......Send RCremote key\n", name);
+    fprintf(stderr, "  %s dhtread...........Read sensor DHT11 or DHT22\n", name);
+    fprintf(stderr, "  %s dhtsetup..........Check status and on/off DHT sensors\n", name);
     
 #if ENABLE_TEST
     fprintf(stderr, "  %s test ..... run driver reliability test\n", name);
@@ -172,7 +172,7 @@ int main(int argc, char **argv)
 
 //	  printf("%d байт: %u %u %u %u %u\n",cnt,(unsigned char)(buffer[0]),(unsigned char)(buffer[1]),(unsigned char)(buffer[2]),(unsigned char)(buffer[3]),(unsigned char)(buffer[4]));
 
-			if (buffer[0]==0 && buffer[1]==0 && buffer[2]==0 && buffer[3]==0) printf("DHT датчик не найден или не включен командой dhtsetup.\n");
+			if (buffer[0]==0 && buffer[1]==0 && buffer[2]==0 && buffer[3]==0) printf("DHT was not found or was not set up using dhtsetup.\n");
 			else if ((((unsigned char)buffer[0] + (unsigned char)buffer[1] +(unsigned char) buffer[2] + (unsigned char)buffer[3] )& 0xFF) == (unsigned char)buffer[4])
 			{
 
@@ -191,7 +191,7 @@ int main(int argc, char **argv)
 					printf("DHT22: %.1f °C  %.1f %%\n", f, h);
 				}
 			}
-			else printf("DHT Ошибка\n");
+			else printf("DHT error\n");
 		}
 	}
 	else if(strcasecmp(argv[1], "status") == 0)
@@ -278,7 +278,7 @@ int main(int argc, char **argv)
 					if ((unsigned char)(buffer[f])!=1) printf("LED %d mode output (%d)\n",f+1,(unsigned char)(buffer[f]));
 					else printf("LED %d mode input (%d)\n",f+1,(unsigned char)(buffer[f]));
 				}
-				fprintf(stderr, "Установка порта на ввод или на вывод:  %s <Номер GPIO> <0 или 1>  \n", argv[0]);
+				fprintf(stderr, "Switch port to input or output:  %s <GPIO number> <0 or 1>  \n", argv[0]);
 			}
 		}
 		else
@@ -301,9 +301,9 @@ int main(int argc, char **argv)
 				// printf(" %d %d)\n",keyh,key);
 				cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 4,key, keyh+256*per, buffer, sizeof(buffer), 5000);
 			}
-			else printf("Код не может быть больше 531440\n");
+			else printf("The code can\'t be more than 531440\n");
 		}
-		else printf("Не указан обязательный параметр:число от 0 до 531440\n");
+		else printf("The required param is missing: number 0 to 531440\n");
 
 	//-----------------------pwm start
 	}
@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
 			}
 		}
-		else printf("Не указан обязательный параметр:число от 0 до 255\n");
+		else printf("The required param is missing: number 0 to 255\n");
 
 	}
 	else if(strcasecmp(argv[1], "pwm4") == 0)
@@ -335,7 +335,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
 			}
 		}
-		else printf("Не указан обязательный параметр:число от 0 до 255\n");
+		else printf("The required param is missing: number 0 to 255\n");
 		//-----------------------pwm end
 	}
 	else if(strcasecmp(argv[1], "dhtsetup") == 0)
@@ -346,15 +346,15 @@ int main(int argc, char **argv)
 			int mode= atoi(argv[2]);
 
 			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 6, mode, 0, buffer, sizeof(buffer), 5000);
-			if (mode==1) printf("Установка:Датчик DHT включен,обновление произойдет в течении минуты.\n");
-			else printf("Установка:Датчик DHT выключен\n");
+			if (mode==1) printf("Configuration: DHT sensor is on, data refreshed very minute.\n");
+			else printf("Configuration: DHT sensor is off\n");
 		}
 		else
 		{
 			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 5, 0, 0, buffer, sizeof(buffer), 5000);
-			if (buffer[0]==1) printf("Статус:Датчик DHT включен (%u)\n",(unsigned char)buffer[0]);
-			else printf("Статус:Датчик DHT выключен (%u)\n",(unsigned char)buffer[0]);
-			printf("Установка:%s dhtsetup 1 или 0 чтобы включить или выключить опрос датчиков\n",argv[0]);
+			if (buffer[0]==1) printf("Status: DHT sensor is on (%u)\n",(unsigned char)buffer[0]);
+			else printf("Status: DHT sensor is off (%u)\n",(unsigned char)buffer[0]);
+			printf("Configuration: %s dhtsetup 1 or 0 to enable or disable sensor polling\n",argv[0]);
 		}
 	}
 	else if(strcasecmp(argv[1], "analog") == 0)
@@ -383,9 +383,9 @@ int main(int argc, char **argv)
 		if(argc > 2)
 		{
 			if (atoi(argv[2])>0 && atoi(argv[2])<9 )digitalwrite (atoi(argv[2]),isOn);
-			else printf("Возможный диапазон портов от 1 до 8\n");
+			else printf("Port range 1 to 8\n");
 		}
-		else printf("Установка:%s on <номер GPIO> или off для выключения\n",argv[0]);
+		else printf("Configuration: %s on <GPIO number> or off to turn off\n",argv[0]);
 #if ENABLE_TEST
 	}
 	else if(strcasecmp(argv[1], "test") == 0)
