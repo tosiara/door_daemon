@@ -31,6 +31,8 @@ To flash firmware you need another USBasp or Arduino. Binary firmware is located
 
 ### Door sensor
 
+<img src="http://www.homes-smart.ru/images/gpioUSB.PNG">
+
 * Connect door sensor to pins 6 (gpio 7) and 10 (gpio gnd)
 * Swith port to input: `sudo ./gpio-usb mode 7 1`
 * Enable port: `sudo ./gpio-usb on 7`
