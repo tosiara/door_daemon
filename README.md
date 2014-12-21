@@ -3,6 +3,8 @@ usbasp-gpio
 
 ## About
 
+This is fork of the usb-gpio project: http://www.homes-smart.ru/index.php/oborudovanie/uroki-i-primery/41-usb-kontroller-umnogo-doma
+
 Convert your USBasp into USB GPIO:
 * Door sensor (NC/NO)
 * DS18B20 thermometer
