@@ -23,31 +23,39 @@ int                 cnt;
 /* mode control without writing to EEROM */
 int pinmode(int pin,int mode)
 {
-	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 2,mode*256+pin, 0, buffer, sizeof(buffer), 5000);
+	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+		2, mode * 256 + pin, 0, buffer, sizeof(buffer), 5000);
+
 	if(cnt < 0)
 	{
 		fprintf(stderr, "USB error: %s\n", usb_strerror());
 		return -2;
 	}
-	else return 1;
+
+	return 1;
 }
 
 /* mode control with write to EEROM */
 int pinmodeEEROM(int pin,int mode)
 {
-	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 3,mode*256+pin, 0, buffer, sizeof(buffer), 5000);
+	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+		3, mode * 256 + pin, 0, buffer, sizeof(buffer), 5000);
+
 	if(cnt < 0)
 	{
 		fprintf(stderr, "USB error: %s\n", usb_strerror());
 		return -2;
 	}
-	else return 1;
+
+	return 1;
 }
 
 /* port status read */
 int digitalread(int pin)
 {
-	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 24, pin, 0, buffer, sizeof(buffer), 5000);
+	cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+		24, pin, 0, buffer, sizeof(buffer), 5000);
+
 	if(cnt < 1)
 	{
 		if(cnt < 0)
@@ -61,24 +69,29 @@ int digitalread(int pin)
 			return -1;
 		}
 	}
-	else return (buffer[0]);
+
+	return (buffer[0]);
 }
 
 /* port write */
 int digitalwrite(int pin,int data)
 {
-	if (pin>0 && pin<9)
+	if (pin > 0 && pin < 9)
 	{
 		// CUSTOM_RQ_SET_STATUS
-		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT, 1, data*256+pin, 0, buffer, sizeof(buffer), 5000);
+		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_OUT,
+			1, data * 256 + pin, 0, buffer, sizeof(buffer), 5000);
+
 		if(cnt < 0)
 		{
 			fprintf(stderr, "USB error: %s\n", usb_strerror());
 			return -2;
 		}
-		else return 1;
+
+		return 1;
 	}
-	else return -1;
+
+	return -1;
 }
 
 static void usage(char *name)
@@ -86,8 +99,8 @@ static void usage(char *name)
     fprintf(stderr, "Example from http://homes-smart.ru/\n");
     fprintf(stderr, "Version gpio-usb 1.0 date 10.09.13\n");
     fprintf(stderr, "usage:\n");
-    fprintf(stderr, "  %s on <GPIO number>...Port on\n", name);
-    fprintf(stderr, "  %s off <GPIO number>..Port off\n", name);
+    fprintf(stderr, "  %s on <GPIO number>..Port on\n", name);
+    fprintf(stderr, "  %s off <GPIO number>.Port off\n", name);
     fprintf(stderr, "  %s mode .............Manage port mode\n", name);
     fprintf(stderr, "  %s status .......... Show status of GPIO output\n", name);
     fprintf(stderr, "  %s statusin ... .....Show status of GPIO input\n", name);
@@ -154,17 +167,15 @@ int main(int argc, char **argv)
 
 	if(strcasecmp(argv[1], "dhtread") == 0)
 	{
-		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 22, 0, 0, buffer, sizeof(buffer), 5000);
+		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+			22, 0, 0, buffer, sizeof(buffer), 5000);
+
 		if(cnt < 1)
 		{
-			if(cnt < 0)
-			{
+			if(cnt < 0) 
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
-			}
 			else
-			{
 				fprintf(stderr, "only %d bytes received.\n", cnt);
-			}
 		}
 		else
 		{
@@ -175,7 +186,6 @@ int main(int argc, char **argv)
 			if (buffer[0]==0 && buffer[1]==0 && buffer[2]==0 && buffer[3]==0) printf("DHT was not found or was not set up using dhtsetup.\n");
 			else if ((((unsigned char)buffer[0] + (unsigned char)buffer[1] +(unsigned char) buffer[2] + (unsigned char)buffer[3] )& 0xFF) == (unsigned char)buffer[4])
 			{
-
 				// dht11
 				if (buffer[1]==0 && buffer[3]==0) printf("DHT11:%d %% %d C\n",(buffer[0]),(buffer[2]));
 				else
@@ -191,64 +201,56 @@ int main(int argc, char **argv)
 					printf("DHT22: %.1f °C  %.1f %%\n", f, h);
 				}
 			}
-			else printf("DHT error\n");
+			else
+				printf("DHT error\n");
 		}
 	}
 	else if(strcasecmp(argv[1], "status") == 0)
 	{
-		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, CUSTOM_RQ_GET_STATUS, 0, 0, buffer, sizeof(buffer), 5000);
+		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, CUSTOM_RQ_GET_STATUS,
+			0, 0, buffer, sizeof(buffer), 5000);
+
 		if(cnt < 1)
 		{
 			if(cnt < 0)
-			{
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
-			}
 			else
-			{
 				fprintf(stderr, "only %d bytes received.\n", cnt);
-			}
 		}
 		else
 		{
 			// printf("LED is %s\n", buffer[0] ? "on" : "off");
 			int f;
 			for(f = 0; f < 8; f++)
-			{
-				printf("LED %d is %s\n",f+1, buffer[f] ? "on" : "off");
-			}
+				printf("LED %d is %s\n", f + 1, buffer[f] ? "on" : "off");
 		}
 	}
 	// port status output in "input" mode
 	else if(strcasecmp(argv[1], "statusin") == 0)
 	{
-
 		if(argc > 2)
 		{
-			int pin= atoi(argv[2]);
+			int pin = atoi(argv[2]);
 			printf("MODE PIN %d is %d\n",pin, digitalread(pin));
 		}
 		else
 		{
 			printf("all pins:\n");
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 25, 0, 0, buffer, sizeof(buffer), 5000);
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				25, 0, 0, buffer, sizeof(buffer), 5000);
+
 			if(cnt < 1)
 			{
 				if(cnt < 0)
-				{
 					fprintf(stderr, "USB error: %s\n", usb_strerror());
-				}
 				else
-				{
 					fprintf(stderr, "only %d bytes received.\n", cnt);
-				}
 			}
 			else
 			{
 				int f;
 				for(f = 0; f < 8; f++)
-				{
-					printf("LED %d is %d\n",f+1, (int)(buffer[f]));
-				}
+					printf("LED %d is %d\n", f + 1, (int)(buffer[f]));
 			}
 		}
 	}
@@ -258,33 +260,34 @@ int main(int argc, char **argv)
 		// output of ports' modes
 		if(argc < 4)
 		{
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 21, 0, 0, buffer, sizeof(buffer), 5000);
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				21, 0, 0, buffer, sizeof(buffer), 5000);
+
 			if(cnt < 1)
 			{
 				if(cnt < 0)
-				{
 					fprintf(stderr, "USB error: %s\n", usb_strerror());
-				}
 				else
-				{
 					fprintf(stderr, "only %d bytes received.\n", cnt);
-				}
 			}
 			else
 			{
 				int f;
 				for(f = 0; f < cnt; f++)
 				{
-					if ((unsigned char)(buffer[f])!=1) printf("LED %d mode output (%d)\n",f+1,(unsigned char)(buffer[f]));
-					else printf("LED %d mode input (%d)\n",f+1,(unsigned char)(buffer[f]));
+					if ((unsigned char)(buffer[f]) != 1)
+						printf("LED %d mode output (%d)\n", f + 1, (unsigned char)(buffer[f]));
+					else
+						printf("LED %d mode input (%d)\n", f + 1, (unsigned char)(buffer[f]));
 				}
+
 				fprintf(stderr, "Switch port to input or output:  %s <GPIO number> <0 or 1>  \n", argv[0]);
 			}
 		}
 		else
 		{
 			// set mode of 1 port
-			pinmodeEEROM (atoi(argv[2]),atoi(argv[3]));
+			pinmodeEEROM (atoi(argv[2]), atoi(argv[3]));
 		}
 	}
 	else if(strcasecmp(argv[1], "rcsend") == 0)
@@ -296,10 +299,11 @@ int main(int argc, char **argv)
 			{
 				int per=3;
 				// manual period
-				if(argc > 3) per=atoi(argv[3]);
+				if(argc > 3) per = atoi(argv[3]);
 				unsigned int keyh = (unsigned long)key >> 16;
 				// printf(" %d %d)\n",keyh,key);
-				cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 4,key, keyh+256*per, buffer, sizeof(buffer), 5000);
+				cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+					4, key, keyh + 256 * per, buffer, sizeof(buffer), 5000);
 			}
 			else printf("The code can\'t be more than 531440\n");
 		}
@@ -314,14 +318,14 @@ int main(int argc, char **argv)
 			int pin= atoi(argv[2]);
 			// int val= atoi(argv[3]);
 
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 23,pin, 0, buffer, sizeof(buffer), 5000);
-			if(cnt < 0)
-			{
-				fprintf(stderr, "USB error: %s\n", usb_strerror());
-			}
-		}
-		else printf("The required param is missing: number 0 to 255\n");
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				23, pin, 0, buffer, sizeof(buffer), 5000);
 
+			if(cnt < 0)
+				fprintf(stderr, "USB error: %s\n", usb_strerror());
+		}
+		else
+			printf("The required param is missing: number 0 to 255\n");
 	}
 	else if(strcasecmp(argv[1], "pwm4") == 0)
 	{
@@ -329,13 +333,14 @@ int main(int argc, char **argv)
 		{
 			int pin= atoi(argv[2]);
 			// int val= atoi(argv[3]);
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 24,pin, 0, buffer, sizeof(buffer), 5000);
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				24, pin, 0, buffer, sizeof(buffer), 5000);
+
 	        if(cnt < 0)
-			{
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
-			}
 		}
-		else printf("The required param is missing: number 0 to 255\n");
+		else
+			printf("The required param is missing: number 0 to 255\n");
 		//-----------------------pwm end
 	}
 	else if(strcasecmp(argv[1], "dhtsetup") == 0)
@@ -345,47 +350,53 @@ int main(int argc, char **argv)
 		{
 			int mode= atoi(argv[2]);
 
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 6, mode, 0, buffer, sizeof(buffer), 5000);
-			if (mode==1) printf("Configuration: DHT sensor is on, data refreshed very minute.\n");
-			else printf("Configuration: DHT sensor is off\n");
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				6, mode, 0, buffer, sizeof(buffer), 5000);
+
+			if (mode == 1)
+				printf("Configuration: DHT sensor is on, data refreshed very minute.\n");
+			else
+				printf("Configuration: DHT sensor is off\n");
 		}
 		else
 		{
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 5, 0, 0, buffer, sizeof(buffer), 5000);
-			if (buffer[0]==1) printf("Status: DHT sensor is on (%u)\n",(unsigned char)buffer[0]);
-			else printf("Status: DHT sensor is off (%u)\n",(unsigned char)buffer[0]);
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+				5, 0, 0, buffer, sizeof(buffer), 5000);
+
+			if (buffer[0]==1)
+				printf("Status: DHT sensor is on (%u)\n",(unsigned char)buffer[0]);
+			else
+				printf("Status: DHT sensor is off (%u)\n",(unsigned char)buffer[0]);
+
 			printf("Configuration: %s dhtsetup 1 or 0 to enable or disable sensor polling\n",argv[0]);
 		}
 	}
 	else if(strcasecmp(argv[1], "analog") == 0)
 	{
 		// analog port
-		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, 17, 0, 0, buffer, sizeof(buffer), 5000);
+		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
+			17, 0, 0, buffer, sizeof(buffer), 5000);
 
 		if(cnt < 1)
 		{
 			if(cnt < 0)
-			{
 				fprintf(stderr, "USB error: %s\n", usb_strerror());
-			}
 			else
-			{
 				fprintf(stderr, "only %d bytes received.\n", cnt);
-			}
 		}
 		else
-		{
 			printf("analog:%u (%i %i)\n",((unsigned char)buffer[0]+(unsigned char)buffer[1]*256),(unsigned char)buffer[0],(unsigned char)buffer[1]);
-		}
 	}
 	else if((isOn = (strcasecmp(argv[1], "on") == 0)) || strcasecmp(argv[1], "off") == 0)
 	{
 		if(argc > 2)
 		{
-			if (atoi(argv[2])>0 && atoi(argv[2])<9 )digitalwrite (atoi(argv[2]),isOn);
-			else printf("Port range 1 to 8\n");
+			if (atoi(argv[2]) > 0 && atoi(argv[2]) < 9)
+				digitalwrite (atoi(argv[2]), isOn);
+			else
+				printf("Port range 1 to 8\n");
 		}
-		else printf("Configuration: %s on <GPIO number> or off to turn off\n",argv[0]);
+		else printf("Configuration: %s on <GPIO number> or off to turn off\n", argv[0]);
 #if ENABLE_TEST
 	}
 	else if(strcasecmp(argv[1], "test") == 0)
@@ -401,7 +412,9 @@ int main(int argc, char **argv)
 				fprintf(stderr, "\r%05d", i+1);
 				fflush(stderr);
 			}
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, CUSTOM_RQ_ECHO, value, index, buffer, sizeof(buffer), 5000);
+			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, CUSTOM_RQ_ECHO,
+				value, index, buffer, sizeof(buffer), 5000);
+
 			if(cnt < 0)
 			{
 				fprintf(stderr, "\nUSB error in iteration %d: %s\n", i, usb_strerror());
@@ -422,6 +435,7 @@ int main(int argc, char **argv)
 			}
 		}
 		fprintf(stderr, "\nTest completed.\n");
+
 #endif /* ENABLE_TEST */
 	}
 	else
@@ -429,6 +443,7 @@ int main(int argc, char **argv)
 		usage(argv[0]);
 		exit(1);
 	}
+
 	usb_close(handle);
 	return 0;
 }
