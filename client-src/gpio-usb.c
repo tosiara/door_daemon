@@ -109,10 +109,6 @@ static void usage(char *name)
     fprintf(stderr, "  %s rcsend <key>......Send RCremote key\n", name);
     fprintf(stderr, "  %s dhtread...........Read sensor DHT11 or DHT22\n", name);
     fprintf(stderr, "  %s dhtsetup..........Check status and on/off DHT sensors\n", name);
-    
-#if ENABLE_TEST
-    fprintf(stderr, "  %s test ..... run driver reliability test\n", name);
-#endif /* ENABLE_TEST */
 }
 
 int main(int argc, char **argv)
@@ -143,28 +139,6 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-    /* Since we use only control endpoint 0, we don't need to choose a
-     * configuration and interface. Reading device descriptor and setting a
-     * configuration and interface is done through endpoint 0 after all.
-     * However, newer versions of Linux require that we claim an interface
-     * even for endpoint 0. Enable the following code if your operating system
-     * needs it: */
-#if 0
-    int retries = 1, usbConfiguration = 1, usbInterface = 0;
-    if(usb_set_configuration(handle, usbConfiguration) && showWarnings){
-        fprintf(stderr, "Warning: could not set configuration: %s\n", usb_strerror());
-    }
-    /* now try to claim the interface and detach the kernel HID driver on
-     * Linux and other operating systems which support the call. */
-    while((len = usb_claim_interface(handle, usbInterface)) != 0 && retries-- > 0){
-#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
-        if(usb_detach_kernel_driver_np(handle, 0) < 0 && showWarnings){
-            fprintf(stderr, "Warning: could not detach kernel driver: %s\n", usb_strerror());
-        }
-#endif
-    }
-#endif
-
 	if(strcasecmp(argv[1], "dhtread") == 0)
 	{
 		cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
@@ -179,10 +153,6 @@ int main(int argc, char **argv)
 		}
 		else
 		{
-//	  printf("%d байт: %d %d %d %d %d\n",cnt,(unsigned char)(buffer[0]),(unsigned char)(buffer[1]),(unsigned char)(buffer[2]),(unsigned char)(buffer[3]),(unsigned char)(buffer[4]));
-
-//	  printf("%d байт: %u %u %u %u %u\n",cnt,(unsigned char)(buffer[0]),(unsigned char)(buffer[1]),(unsigned char)(buffer[2]),(unsigned char)(buffer[3]),(unsigned char)(buffer[4]));
-
 			if (buffer[0]==0 && buffer[1]==0 && buffer[2]==0 && buffer[3]==0) printf("DHT was not found or was not set up using dhtsetup.\n");
 			else if ((((unsigned char)buffer[0] + (unsigned char)buffer[1] +(unsigned char) buffer[2] + (unsigned char)buffer[3] )& 0xFF) == (unsigned char)buffer[4])
 			{
@@ -254,7 +224,6 @@ int main(int argc, char **argv)
 			}
 		}
 	}
-	// port modes
 	else if(strcasecmp(argv[1], "mode") == 0)
 	{
 		// output of ports' modes
@@ -301,22 +270,18 @@ int main(int argc, char **argv)
 				// manual period
 				if(argc > 3) per = atoi(argv[3]);
 				unsigned int keyh = (unsigned long)key >> 16;
-				// printf(" %d %d)\n",keyh,key);
 				cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
 					4, key, keyh + 256 * per, buffer, sizeof(buffer), 5000);
 			}
 			else printf("The code can\'t be more than 531440\n");
 		}
 		else printf("The required param is missing: number 0 to 531440\n");
-
-	//-----------------------pwm start
 	}
 	else if(strcasecmp(argv[1], "pwm3") == 0)
 	{
 		if(argc > 2)
 		{
 			int pin= atoi(argv[2]);
-			// int val= atoi(argv[3]);
 
 			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
 				23, pin, 0, buffer, sizeof(buffer), 5000);
@@ -332,7 +297,7 @@ int main(int argc, char **argv)
 		if(argc > 2)
 		{
 			int pin= atoi(argv[2]);
-			// int val= atoi(argv[3]);
+
 			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN,
 				24, pin, 0, buffer, sizeof(buffer), 5000);
 
@@ -341,7 +306,6 @@ int main(int argc, char **argv)
 		}
 		else
 			printf("The required param is missing: number 0 to 255\n");
-		//-----------------------pwm end
 	}
 	else if(strcasecmp(argv[1], "dhtsetup") == 0)
 	{
@@ -397,46 +361,6 @@ int main(int argc, char **argv)
 				printf("Port range 1 to 8\n");
 		}
 		else printf("Configuration: %s on <GPIO number> or off to turn off\n", argv[0]);
-#if ENABLE_TEST
-	}
-	else if(strcasecmp(argv[1], "test") == 0)
-	{
-		int i;
-		srandomdev();
-		for(i = 0; i < 50000; i++)
-		{
-			int value = random() & 0xffff, index = random() & 0xffff;
-			int rxValue, rxIndex;
-			if((i+1) % 100 == 0)
-			{
-				fprintf(stderr, "\r%05d", i+1);
-				fflush(stderr);
-			}
-			cnt = usb_control_msg(handle, USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_ENDPOINT_IN, CUSTOM_RQ_ECHO,
-				value, index, buffer, sizeof(buffer), 5000);
-
-			if(cnt < 0)
-			{
-				fprintf(stderr, "\nUSB error in iteration %d: %s\n", i, usb_strerror());
-				break;
-			}
-			else if(cnt != 4)
-			{
-				fprintf(stderr, "\nerror in iteration %d: %d bytes received instead of 4\n", i, cnt);
-				break;
-			}
-			rxValue = ((int)buffer[0] & 0xff) | (((int)buffer[1] & 0xff) << 8);
-			rxIndex = ((int)buffer[2] & 0xff) | (((int)buffer[3] & 0xff) << 8);
-			if(rxValue != value || rxIndex != index)
-			{
-				fprintf(stderr, "\ndata error in iteration %d:\n", i);
-				fprintf(stderr, "rxValue = 0x%04x value = 0x%04x\n", rxValue, value);
-				fprintf(stderr, "rxIndex = 0x%04x index = 0x%04x\n", rxIndex, index);
-			}
-		}
-		fprintf(stderr, "\nTest completed.\n");
-
-#endif /* ENABLE_TEST */
 	}
 	else
 	{
