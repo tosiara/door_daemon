@@ -1,4 +1,4 @@
-parapin-door-daemon
+wiringPi-door-daemon
 ===========
 
 ## About
@@ -7,13 +7,10 @@ A daemon for door sensor
 
 ## Hardware
 
-Uses LPT port and parapin library
+Uses GPIO header compatible with wiringPi library
 
 ## Compile
 
-First compile parapin library
-
-* cd parapin-1.5.0; make
 * cd client-src; make
 
 ## Use
