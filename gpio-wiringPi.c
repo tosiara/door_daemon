@@ -14,8 +14,8 @@ int eventDetected();
 int insideEvent();
 int eventEnded();
 
-char *script_boot  = "/usr/bin/gpio-boot.sh";
-char *script_start = "/usr/bin/gpio-start.sh";
+char *script_boot  = "/usr/bin/gpio-boot.sh &";
+char *script_start = "/usr/bin/gpio-start.sh &";
 char *script_end = "";
 
 int DEBUG = 0;
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	if (strlen (script_boot))
 		system (script_boot);
 
-
+	syslog (LOG_NOTICE, "wiringPiSetup");
 	wiringPiSetup();
 	pinMode (DOOR_PIN, INPUT);
 
@@ -50,20 +50,27 @@ int main(int argc, char *argv[])
 	while (!breakMarker)
 	{
 		int doorState = digitalRead (DOOR_PIN);
-		if (DEBUG) printf ("digitalRead: %d\n", doorState);
+		if (DEBUG)
+		{
+			printf ("digitalRead: %d\n", doorState);
+			syslog (LOG_NOTICE, "digitalread %d", doorState);
+		}
 
 		/*  only 0 or 1 are possible
-			if we read something different, like 2 or -1 we assume it is non-zero (door open) */
+			if we read something different, like 2 or -1
+			then  we assume it is non-zero (door open) */
 		if (doorState != GPIO_STATE_CLOSED)
 			doorState = GPIO_STATE_OPENED;
 
 		int sensorToggled = (doorState != lastState);
+
 		if (sensorToggled && lastState == GPIO_STATE_CLOSED)
 			breakMarker = eventDetected();
 		else if (sensorToggled && lastState == GPIO_STATE_OPENED)
 			breakMarker = eventEnded();
 		else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
 			breakMarker = insideEvent();
+
 		lastState = doorState;
 		usleep (400000);
 	}
