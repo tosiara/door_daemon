@@ -33,31 +33,31 @@ int main(int argc, char *argv[])
 		system (script_boot);
 
 
-  wiringPiSetup();
-  pinMode (DOOR_PIN, INPUT);
+	wiringPiSetup();
+	pinMode (DOOR_PIN, INPUT);
 
-  int breakMarker = 0;
+	int breakMarker = 0;
   
-  /* initial state must be "0" - "door closed" */
-  int lastState = GPIO_STATE_CLOSED;
+	/* initial state must be "0" - "door closed" */
+	int lastState = GPIO_STATE_CLOSED;
   
-  while (!breakMarker)
-  {
-    int doorState = digitalRead (DOOR_PIN);
-    if (doorState != GPIO_STATE_CLOSED) doorState = GPIO_STATE_OPENED;
+	while (!breakMarker)
+	{
+		int doorState = digitalRead (DOOR_PIN);
+		if (doorState != GPIO_STATE_CLOSED) doorState = GPIO_STATE_OPENED;
 
-    int sensorToggled = (doorState != lastState);
-    if (sensorToggled && lastState == GPIO_STATE_CLOSED)
-      breakMarker = eventDetected();
-    else if (sensorToggled && lastState == GPIO_STATE_OPENED)
-      breakMarker = eventEnded();
-    else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
-      breakMarker = insideEvent();
-    lastState = doorState;
-    usleep (400000);
-  }  
+		int sensorToggled = (doorState != lastState);
+		if (sensorToggled && lastState == GPIO_STATE_CLOSED)
+			breakMarker = eventDetected();
+		else if (sensorToggled && lastState == GPIO_STATE_OPENED)
+			breakMarker = eventEnded();
+		else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
+			breakMarker = insideEvent();
+		lastState = doorState;
+		usleep (400000);
+	}
 
-  return 0;
+	return 0;
 }
 
 int eventDetected()
@@ -69,7 +69,7 @@ int eventDetected()
 
 int insideEvent()
 {
-  return 0;
+	return 0;
 }
 
 int eventEnded()
