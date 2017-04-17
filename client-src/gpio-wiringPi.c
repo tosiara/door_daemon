@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <syslog.h>
 
 #include <wiringPi.h>
 
@@ -33,6 +34,7 @@ int main(int argc, char *argv[])
 			DEBUG = 1;
 	}
 
+	syslog (LOG_NOTICE, "Door daemon start");
 	if (strlen (script_boot))
 		system (script_boot);
 
@@ -71,6 +73,7 @@ int main(int argc, char *argv[])
 
 int eventDetected()
 {
+	syslog (LOG_NOTICE, "Event start");
 	if (strlen (script_start))
 		system (script_start);
 	return 0;
@@ -83,6 +86,7 @@ int insideEvent()
 
 int eventEnded()
 {
+	syslog (LOG_NOTICE, "Event end");
 	if (strlen (script_end))
 		system (script_end);
 	return 0;
