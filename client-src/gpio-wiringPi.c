@@ -49,7 +49,11 @@ int main(int argc, char *argv[])
 	{
 		int doorState = digitalRead (DOOR_PIN);
 		if (DEBUG) printf ("digitalRead: %d\n", doorState);
-		if (doorState != GPIO_STATE_CLOSED) doorState = GPIO_STATE_OPENED;
+
+		/*  only 0 or 1 are possible
+			if we read something different, like 2 or -1 we assume it is non-zero (door open) */
+		if (doorState != GPIO_STATE_CLOSED)
+			doorState = GPIO_STATE_OPENED;
 
 		int sensorToggled = (doorState != lastState);
 		if (sensorToggled && lastState == GPIO_STATE_CLOSED)
