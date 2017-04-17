@@ -17,6 +17,8 @@ char *script_boot  = "/usr/bin/gpio-boot.sh";
 char *script_start = "/usr/bin/gpio-start.sh";
 char *script_end = "";
 
+int DEBUG = 0;
+
 int main(int argc, char *argv[])
 {
 	for (int i = 1; i < argc; i++)
@@ -27,6 +29,8 @@ int main(int argc, char *argv[])
 			script_start = argv[i+1];
 		if (strcmp ("-e", argv[i]) == NULL && (argc > i+1) && argv[i+1][0] != '-')
 			script_end = argv[i+1];
+		if (strcmp ("-d", argv[i]) == NULL)
+			DEBUG = 1;
 	}
 
 	if (strlen (script_boot))
@@ -44,6 +48,7 @@ int main(int argc, char *argv[])
 	while (!breakMarker)
 	{
 		int doorState = digitalRead (DOOR_PIN);
+		if (DEBUG) printf ("digitalRead: %d\n", doorState);
 		if (doorState != GPIO_STATE_CLOSED) doorState = GPIO_STATE_OPENED;
 
 		int sensorToggled = (doorState != lastState);
