@@ -13,8 +13,26 @@ int eventDetected();
 int insideEvent();
 int eventEnded();
 
+char *script_boot = "/usr/bin/gpio-boot.sh";
+char *script_start = "usr/bin/gpio-start.sh";
+char *script_end = "";
+
 int main(int argc, char *argv[])
 {
+	for (int i = 1; i < argc; i++)
+	{
+		if (strcmp ("-b", argv[i]) == NULL && (argc > i+1) && argv[i+1][0] != '-')
+			script_boot = argv[i+1];
+		if (strcmp ("-s", argv[i]) == NULL && (argc > i+1) && argv[i+1][0] != '-')
+			script_start = argv[i+1];
+		if (strcmp ("-e", argv[i]) == NULL && (argc > i+1) && argv[i+1][0] != '-')
+			script_end = argv[i+1];
+	}
+
+	if (strlen (script_boot))
+		system (script_boot);
+
+
   wiringPiSetup();
   pinMode (DOOR_PIN, INPUT);
 
@@ -44,7 +62,9 @@ int main(int argc, char *argv[])
 
 int eventDetected()
 {
-  return 0;
+	if (strlen (script_start))
+		system (script_start);
+	return 0;
 }
 
 int insideEvent()
@@ -54,6 +74,8 @@ int insideEvent()
 
 int eventEnded()
 {
-  return 0;
+	if (strlen (script_end))
+		system (script_end);
+	return 0;
 }
 
