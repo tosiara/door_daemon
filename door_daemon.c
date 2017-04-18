@@ -3,22 +3,9 @@
 #include <unistd.h>
 #include <syslog.h>
 
-#include <wiringPi.h>
+#include "gpio.h"
+#include "door_daemon.h"
 
-#define DOOR_PIN 6
-
-const int GPIO_STATE_CLOSED = 0;
-const int GPIO_STATE_OPENED = 1;
-
-int eventDetected();
-int insideEvent();
-int eventEnded();
-
-char *script_boot  = "/usr/bin/gpio-boot.sh &";
-char *script_start = "/usr/bin/gpio-start.sh &";
-char *script_end = "";
-
-int DEBUG = 0;
 
 int main(int argc, char *argv[])
 {
@@ -38,10 +25,7 @@ int main(int argc, char *argv[])
 	if (strlen (script_boot))
 		system (script_boot);
 
-	syslog (LOG_NOTICE, "wiringPiSetup");
-	wiringPiSetup();
-	syslog (LOG_NOTICE, "Setting pin %d to INPUT", DOOR_PIN);
-	pinMode (DOOR_PIN, INPUT);
+	gpio_init();
 
 	int breakMarker = 0;
   
@@ -50,7 +34,7 @@ int main(int argc, char *argv[])
   
 	while (!breakMarker)
 	{
-		int doorState = digitalRead (DOOR_PIN);
+		int doorState = gpio_read();
 		if (DEBUG)
 		{
 			printf ("digitalRead: %d\n", doorState);
