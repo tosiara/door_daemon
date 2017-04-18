@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
 
 	syslog (LOG_NOTICE, "wiringPiSetup");
 	wiringPiSetup();
+	syslog (LOG_NOTICE, "Setting pin %d to INPUT", DOOR_PIN);
 	pinMode (DOOR_PIN, INPUT);
 
 	int breakMarker = 0;
