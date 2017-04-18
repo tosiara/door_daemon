@@ -1,6 +1,7 @@
 const int GPIO_STATE_CLOSED = 0;
 const int GPIO_STATE_OPENED = 1;
 
+void event_boot();
 int eventDetected();
 int insideEvent();
 int eventEnded();
