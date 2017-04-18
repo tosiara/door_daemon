@@ -1,0 +1,2 @@
+GPIO = -lwiringPi -lpthread
+
