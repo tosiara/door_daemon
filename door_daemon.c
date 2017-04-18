@@ -10,7 +10,8 @@
 
 int main(int argc, char *argv[])
 {
-	for (int i = 1; i < argc; i++)
+	int i;
+	for (i = 1; i < argc; i++)
 	{
 		if (strcmp ("-b", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			script_boot = argv[i+1];
