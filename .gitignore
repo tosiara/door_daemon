@@ -1,2 +1,3 @@
 door_daemon
 gpio.o
+opendevice.o
