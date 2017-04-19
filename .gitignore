@@ -1,3 +1,5 @@
 door_daemon
 gpio.o
 opendevice.o
+parapin.o
+libparapin.a
