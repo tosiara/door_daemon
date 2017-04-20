@@ -7,7 +7,7 @@ A daemon for door sensor. It monitors gpio pin status and as soon as it changes 
 
 ## Hardware
 
-Requires GPIO and a sensor. Supported GPIO harwdare:
+Requires GPIO and a sensor. Supported GPIO hardware:
 
 * wiringPi - wiringPi library required (not included)
 * USBasp - custom firmware required (included)
