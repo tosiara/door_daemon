@@ -13,7 +13,7 @@ usb_dev_handle      *handle = NULL;
 char                buffer[8];
 int cnt;
 
-int PIN = 7;
+unsigned int DOOR_PIN = 0;
 
 /* mode control without writing to EEROM */
 int pinmode(int pin, int mode)
@@ -98,9 +98,11 @@ const unsigned char rawVid[2], rawPid[2];
 char vendor[] = {USB_CFG_VENDOR_NAME, 0};
 char product[] = {USB_CFG_DEVICE_NAME, 0};
 
-void gpio_init()
+void gpio_init (unsigned int config_pin)
 {
 	int vid, pid;
+
+	DOOR_PIN = config_pin;
 
 	usb_init();
 
@@ -117,8 +119,8 @@ void gpio_init()
 	}
 
 	/* set gpio PIN to input mode, turn gpio PIN on */
-	pinmodeEEROM (PIN, 1);
-	digitalwrite (PIN, 1);
+	pinmodeEEROM (DOOR_PIN, 1);
+	digitalwrite (DOOR_PIN, 1);
 
 }
 
@@ -129,9 +131,9 @@ int gpio_read()
 
 	if (cnt < 1)
 		return 1;
-	if (DEBUG_GPIO) printf ("Pin \"%d\" value: %d\n", PIN, buffer[PIN - 1]);
+	if (DEBUG_GPIO) printf ("Pin \"%d\" value: %d\n", DOOR_PIN, buffer[DOOR_PIN - 1]);
 
 	/* buffer[6] contains gpio 7 value */
-	return buffer[PIN - 1];
+	return buffer[DOOR_PIN - 1];
 }
 
