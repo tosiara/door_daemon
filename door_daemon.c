@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 			breakMarker = insideEvent();
 
 		lastState = doorState;
-		usleep (400000);
+		usleep (GPIO_SLEEP);
 	}
 
 	return 0;
