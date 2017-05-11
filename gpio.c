@@ -5,12 +5,13 @@
 
 #include <wiringPi.h>
 
-#define DOOR_PIN 6
+unsigned int DOOR_PIN = 0;
 
-void gpio_init()
+void gpio_init (unsigned int config_pin)
 {
 	syslog (LOG_NOTICE, "wiringPiSetup");
 	wiringPiSetup();
+	DOOR_PIN = config_pin;
 	syslog (LOG_NOTICE, "Setting pin %d to INPUT", DOOR_PIN);
 	pinMode (DOOR_PIN, INPUT);
 }
