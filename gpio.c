@@ -5,10 +5,12 @@
 
 #include "parapin.h"
 
-#define DOOR_PIN 17
+unsigned int DOOR_PIN = 0;
 
-void gpio_init()
+void gpio_init (unsigned int config_pin)
 {
+	DOOR_PIN = config_pin;
+
 	if (pin_init_user(LPT1) < 0)
 		exit(1);
 
