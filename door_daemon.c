@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	syslog (LOG_NOTICE, "Door daemon start");
 	event_boot();
 
-	gpio_init();
+	gpio_init (pin_config);
 
 	int breakMarker = 0;
   
