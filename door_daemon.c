@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
 			script_start = argv[i+1];
 		if (strcmp ("-e", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			script_end = argv[i+1];
+		if (strcmp ("-p", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
+			pin_config = atoi (argv[i+1]);
 		if (strcmp ("-d", argv[i]) == 0)
 			DEBUG = 1;
 	}
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
 	syslog (LOG_NOTICE, "Door daemon start");
 	event_boot();
 
-	gpio_init();
+	gpio_init (pin_config);
 
 	int breakMarker = 0;
   
