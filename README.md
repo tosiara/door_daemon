@@ -7,22 +7,35 @@ A daemon for door sensor. It monitors gpio pin status and as soon as it changes 
 
 ## Hardware
 
-Requires GPIO and a sensor. Supported GPIO hardware:
+This branch requires `USBasp` with custom firmware (included)
 
-* wiringPi - wiringPi library required (not included)
-* USBasp - custom firmware required (included)
-* LPT port - papapin library used to access LPT (included)
+Pinout:
 
+[![Usbasp gpio pinout](https://img-fotki.yandex.ru/get/196258/73339514.41/0_115d8a_5bf7013d_orig.png)]
+
+Connect your sensor to GND and any available pin, for example, 7 (inner "sys" number 6)
 Any NC ("norlmally closed") type sensor can be used, for example magnetic door sensor
-
 
 ## Compile
 
-Checkout a branch that is matching your GPIO hardware and compile. For example, to compile wiringPi based door daemon:
-* git checkout gpio_wiringPi
+* git checkout gpio_usbasp
 * make
 
-See README.md in the branch for hardware specific tips
+## Flash the firmware
+
+Compile the firmware:
+```
+cd firmware
+make hex
+cd ..
+```
+You need another one USBasp to flash the firmware.
+Plug the programmer-usbasp into a USB port, on the target-usbasp shorten JP2 jumper (self programming mode) and connect both usbasps using the special 8-pin cable.
+
+Flash the firmware:
+``
+avrdude -c usbasp -p m8 -U flash:w:firmware/main.hex
+``
 
 ## Use
 
