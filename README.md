@@ -14,6 +14,7 @@ Pinout:
 ![Usbasp gpio pinout](https://img-fotki.yandex.ru/get/196258/73339514.41/0_115d8a_5bf7013d_orig.png)
 
 Connect your sensor to GND and any available pin, for example, 7 (inner "sys" number 6)
+
 Any NC ("norlmally closed") type sensor can be used, for example magnetic door sensor
 
 ## Compile
