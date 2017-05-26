@@ -18,9 +18,10 @@ Connect your sensor to GND and any available pin, for example, 7 (inner "sys" nu
 Any NC ("norlmally closed") type sensor can be used, for example magnetic door sensor
 
 ## Compile
-
-* git checkout gpio_usbasp
-* make
+```
+git checkout gpio_usbasp
+make
+```
 
 ## Flash the firmware
 
