@@ -14,3 +14,5 @@ char *script_end = "";
 unsigned int pin_config = 0;
 
 int DEBUG = 0;
+int DRY_RUN = 0;
+

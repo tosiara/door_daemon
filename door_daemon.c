@@ -23,6 +23,9 @@ int main(int argc, char *argv[])
 			pin_config = atoi (argv[i+1]);
 		if (strcmp ("-d", argv[i]) == 0)
 			DEBUG = 1;
+		if (strcmp ("-x", argv[i]) == 0)
+			DRY_RUN = 1;
+
 	}
 
 	syslog (LOG_NOTICE, "Door daemon start");
@@ -52,12 +55,15 @@ int main(int argc, char *argv[])
 
 		int sensorToggled = (doorState != lastState);
 
-		if (sensorToggled && lastState == GPIO_STATE_CLOSED)
-			breakMarker = eventDetected();
-		else if (sensorToggled && lastState == GPIO_STATE_OPENED)
-			breakMarker = eventEnded();
-		else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
-			breakMarker = insideEvent();
+		if (!DRY_RUN)
+		{
+			if (sensorToggled && lastState == GPIO_STATE_CLOSED)
+				breakMarker = eventDetected();
+			else if (sensorToggled && lastState == GPIO_STATE_OPENED)
+				breakMarker = eventEnded();
+			else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
+				breakMarker = insideEvent();
+		}
 
 		lastState = doorState;
 		usleep (GPIO_SLEEP);
