@@ -7,22 +7,17 @@ A daemon for door sensor. It monitors gpio pin status and as soon as it changes 
 
 ## Hardware
 
-Requires GPIO and a sensor. Supported GPIO hardware:
-
-* wiringPi - wiringPi library required (not included)
-* USBasp - custom firmware required (included)
-* LPT port - papapin library used to access LPT (included)
+This branch requires any hardware compatible with `WiringPi` (RaspberryPi, BananaPi, Odroid etc)
 
 Any NC ("norlmally closed") type sensor can be used, for example magnetic door sensor
 
 
 ## Compile
 
-Checkout a branch that is matching your GPIO hardware and compile. For example, to compile wiringPi based door daemon:
-* git checkout gpio_wiringPi
-* make
-
-See README.md in the branch for hardware specific tips
+```
+git checkout gpio_wiringPi
+make
+```
 
 ## Use
 
