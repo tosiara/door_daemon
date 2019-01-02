@@ -22,6 +22,17 @@ Any NC ("norlmally closed") type sensor can be used, for example magnetic door s
 git checkout gpio_usbasp
 make
 ```
+## Compile for Openwrt
+```
+export OPENWRT_DIR=/home/path/to/openwrt
+export STAGING_DIR=$OPENWRT_DIR/staging_dir
+export TOOLCHAIN_DIR=$STAGING_DIR/toolchain-mips_24kc_gcc-7.3.0_musl
+export LD_LIBRARY_PATH=$STAGING_DIR/target-mips_24kc_musl/usr/lib
+export LIB_USB_PATH=$OPENWRT_DIR/build_dir/target-mips_24kc_musl/libusb-compat-0.1.5/libusb
+export PATH=$TOOLCHAIN_DIR/bin:$PATH
+mips-openwrt-linux-gcc -o door_daemon door_daemon.c gpio.c opendevice.c -I $LIB_USB_PATH -L $LD_LIBRARY_PATH -lusb -lusb-1.0
+
+```
 
 ## Flash the firmware
 
