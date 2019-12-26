@@ -80,7 +80,7 @@ void event_boot()
 		exec_res = system (script_boot);
 
 	if (exec_res)
-        syslog (LOG_NOTICE, "system exec failed");
+		syslog (LOG_NOTICE, "system exec failed");
 }
 
 int eventDetected()
@@ -112,8 +112,8 @@ int eventEnded()
 	if (strlen (script_end))
 		exec_res = system (script_end);
 
-    if (exec_res)
-        syslog (LOG_NOTICE, "system exec failed");
+	if (exec_res)
+		syslog (LOG_NOTICE, "system exec failed");
 
 	return 0;
 }
