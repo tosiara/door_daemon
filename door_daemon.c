@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
   
 	/* initial state must be "0" - "door closed" */
 	int lastState = GPIO_STATE_CLOSED;
+	int lastOut = GPIO_OUT_LOW;
   
 	while (!breakMarker)
 	{
@@ -65,6 +66,18 @@ int main(int argc, char *argv[])
 				breakMarker = eventEnded();
 			else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
 				breakMarker = insideEvent();
+
+			if (out_pin)
+			{
+				int ext;
+
+				ext = readExternal();
+				if (ext >= 0 && ext <= 255 && ext != lastOut)
+				{
+					writeOutput (ext);
+					lastOut = ext;
+				}
+			}
 		}
 
 		lastState = doorState;
@@ -117,6 +130,25 @@ int eventEnded()
 	if (exec_res)
 		syslog (LOG_NOTICE, "system exec failed");
 
+	return 0;
+}
+
+int readExternal()
+{
+	char c;
+	FILE *fin = fopen("/dev/shm/gpio", "rb");
+	if (!fin)
+		return 1024;
+
+	if (fscanf (fin, "%c", &c) == EOF)
+		return 1025;
+	fclose (fin);
+
+	return c;
+}
+
+int writeOutput(int val)
+{
 	return 0;
 }
 
