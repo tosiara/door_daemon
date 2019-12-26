@@ -12,6 +12,7 @@ char *script_boot  = "/usr/bin/gpio-boot.sh &";
 char *script_start = "/usr/bin/gpio-start.sh &";
 char *script_end = "";
 unsigned int pin_config = 0;
+unsigned int out_pin = 0;
 
 int DEBUG = 0;
 int DRY_RUN = 0;

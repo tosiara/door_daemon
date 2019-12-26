@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
 			script_end = argv[i+1];
 		if (strcmp ("-p", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			pin_config = atoi (argv[i+1]);
+		if (strcmp ("-o", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
+			out_pin = atoi (argv[i+1]);
 		if (strcmp ("-d", argv[i]) == 0)
 			DEBUG = 1;
 		if (strcmp ("-x", argv[i]) == 0)

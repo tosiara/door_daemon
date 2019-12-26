@@ -28,9 +28,11 @@ See README.md in the branch for hardware specific tips
 
 Start daemon and specify command parameters which scripts to run:
 ```
-./door-daemon -b /path/to/boot_event_script.sh -s /path/to/start_event_script.sh -e /path/to/end_event_script.sh -p PIN
+./door-daemon -b /path/to/boot_event_script.sh -s /path/to/start_event_script.sh -e /path/to/end_event_script.sh -p PIN -o OUT
 ```
-PIN is an integer number representing pin number. Default value is `0`, so don't forget to specify your real pin
+PIN is an integer number representing pin number.
+OUT is output pin number. If not defined - will be ignored.
+Default value is `0`, so don't forget to specify your real pin.
 
 If none params specified, following scripts are executed:
 ```
