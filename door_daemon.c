@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
 			script_end = argv[i+1];
 		if (strcmp ("-p", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			pin_config = atoi (argv[i+1]);
+		if (strcmp ("-o", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
+			out_pin = atoi (argv[i+1]);
 		if (strcmp ("-d", argv[i]) == 0)
 			DEBUG = 1;
 		if (strcmp ("-x", argv[i]) == 0)
@@ -37,6 +39,7 @@ int main(int argc, char *argv[])
   
 	/* initial state must be "0" - "door closed" */
 	int lastState = GPIO_STATE_CLOSED;
+	int lastOut = GPIO_OUT_LOW;
   
 	while (!breakMarker)
 	{
@@ -63,6 +66,18 @@ int main(int argc, char *argv[])
 				breakMarker = eventEnded();
 			else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
 				breakMarker = insideEvent();
+
+			if (out_pin)
+			{
+				int ext;
+
+				ext = readExternal();
+				if (ext >= 0 && ext <= 255 && ext != lastOut)
+				{
+					writeOutput (ext);
+					lastOut = ext;
+				}
+			}
 		}
 
 		lastState = doorState;
@@ -80,7 +95,7 @@ void event_boot()
 		exec_res = system (script_boot);
 
 	if (exec_res)
-        syslog (LOG_NOTICE, "system exec failed");
+		syslog (LOG_NOTICE, "system exec failed");
 }
 
 int eventDetected()
@@ -112,9 +127,28 @@ int eventEnded()
 	if (strlen (script_end))
 		exec_res = system (script_end);
 
-    if (exec_res)
-        syslog (LOG_NOTICE, "system exec failed");
+	if (exec_res)
+		syslog (LOG_NOTICE, "system exec failed");
 
+	return 0;
+}
+
+int readExternal()
+{
+	char c;
+	FILE *fin = fopen("/dev/shm/gpio", "rb");
+	if (!fin)
+		return 1024;
+
+	if (fscanf (fin, "%c", &c) == EOF)
+		return 1025;
+	fclose (fin);
+
+	return c;
+}
+
+int writeOutput(int val)
+{
 	return 0;
 }
 
