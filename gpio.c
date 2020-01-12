@@ -23,3 +23,9 @@ int gpio_read()
 	return pin_is_set(LP_PIN[DOOR_PIN]);
 }
 
+int gpio_write(int state)
+{
+
+	return 0;
+}
+
