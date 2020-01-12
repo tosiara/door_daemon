@@ -14,3 +14,9 @@ int gpio_read()
 	return 0;
 }
 
+int gpio_write(int state)
+{
+
+	return 0;
+}
+
