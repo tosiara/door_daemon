@@ -21,3 +21,9 @@ int gpio_read()
 	return digitalRead (DOOR_PIN);
 }
 
+int gpio_write(int state)
+{
+
+	return 0;
+}
+
