@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	syslog (LOG_NOTICE, "Door daemon start");
 	event_boot();
 
-	gpio_init (pin_config);
+	gpio_init (pin_config, out_pin);
 
 	int breakMarker = 0;
   
@@ -66,17 +66,20 @@ int main(int argc, char *argv[])
 				breakMarker = eventEnded();
 			else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
 				breakMarker = insideEvent();
+		}
 
-			if (out_pin)
+		if (out_pin)
+		{
+			int ext;
+
+			ext = readExternal();
+			if (ext >= 0 && ext <= 255 && ext != lastOut)
 			{
-				int ext;
-
-				ext = readExternal();
-				if (ext >= 0 && ext <= 255 && ext != lastOut)
-				{
+				if (DEBUG)
+					printf ("read external: %d\n", ext);
+				if (!DRY_RUN)
 					writeOutput (ext);
-					lastOut = ext;
-				}
+				lastOut = ext;
 			}
 		}
 
@@ -149,6 +152,6 @@ int readExternal()
 
 int writeOutput(int val)
 {
-	return 0;
+	return gpio_write (val);
 }
 
