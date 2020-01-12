@@ -137,3 +137,9 @@ int gpio_read()
 	return buffer[DOOR_PIN - 1];
 }
 
+int gpio_write(int state)
+{
+
+	return 0;
+}
+
