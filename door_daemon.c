@@ -11,14 +11,23 @@
 int main(int argc, char *argv[])
 {
 	int i;
+	char buff_script_start[255];
+	char buff_script_end[255];
+
 	for (i = 1; i < argc; i++)
 	{
 		if (strcmp ("-b", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			script_boot = argv[i+1];
 		if (strcmp ("-s", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
-			script_start = argv[i+1];
+		{
+			snprintf(buff_script_start, 255, "%s &", argv[i+1]);
+			script_start = buff_script_start;
+		}
 		if (strcmp ("-e", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
-			script_end = argv[i+1];
+		{
+			snprintf(buff_script_end, 255, "%s &", argv[i+1]);
+			script_end = buff_script_end;
+		}
 		if (strcmp ("-p", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
 			pin_config = atoi (argv[i+1]);
 		if (strcmp ("-o", argv[i]) == 0 && (argc > i+1) && argv[i+1][0] != '-')
@@ -36,11 +45,11 @@ int main(int argc, char *argv[])
 	gpio_init (pin_config, out_pin);
 
 	int breakMarker = 0;
-  
+
 	/* initial state must be "0" - "door closed" */
 	int lastState = GPIO_STATE_CLOSED;
 	int lastOut = GPIO_OUT_LOW;
-  
+
 	while (!breakMarker)
 	{
 		int doorState = gpio_read();
@@ -60,27 +69,40 @@ int main(int argc, char *argv[])
 
 		if (!DRY_RUN)
 		{
+
+			if (out_pin)
+			{
+				int ext;
+
+				if (DEBUG)
+				{
+					printf ("readExternal %d...:\n", out_pin);
+					syslog (LOG_NOTICE, "readExternal %d...", out_pin);
+				}
+
+				ext = readExternal();
+				if (DEBUG)
+				{
+					printf ("ext=%d\n", ext);
+					syslog (LOG_NOTICE, "ext=%d\n", ext);
+				}
+
+				if (ext >= 0 && ext <= 255 && ext != lastOut)
+				{
+					if (DEBUG)
+						printf ("read external: %d\n", ext);
+					if (!DRY_RUN)
+						writeOutput (ext);
+					lastOut = ext;
+				}
+			}
+
 			if (sensorToggled && lastState == GPIO_STATE_CLOSED)
 				breakMarker = eventDetected();
 			else if (sensorToggled && lastState == GPIO_STATE_OPENED)
 				breakMarker = eventEnded();
 			else if (!sensorToggled && lastState == GPIO_STATE_OPENED)
 				breakMarker = insideEvent();
-		}
-
-		if (out_pin)
-		{
-			int ext;
-
-			ext = readExternal();
-			if (ext >= 0 && ext <= 255 && ext != lastOut)
-			{
-				if (DEBUG)
-					printf ("read external: %d\n", ext);
-				if (!DRY_RUN)
-					writeOutput (ext);
-				lastOut = ext;
-			}
 		}
 
 		lastState = doorState;
@@ -106,6 +128,8 @@ int eventDetected()
 	int exec_res = 0;
 
 	syslog (LOG_NOTICE, "Event start");
+	if (DEBUG)
+		printf ("Event start\n");
 	
 	if (strlen (script_start))
 		exec_res = system (script_start);
@@ -118,6 +142,9 @@ int eventDetected()
 
 int insideEvent()
 {
+	if (DEBUG)
+		printf ("Event inside\n");
+
 	return 0;
 }
 
@@ -126,6 +153,8 @@ int eventEnded()
 	int exec_res = 0;
 
 	syslog (LOG_NOTICE, "Event end");
+	if (DEBUG)
+		printf ("Event end\n");
 
 	if (strlen (script_end))
 		exec_res = system (script_end);
