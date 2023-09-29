@@ -1,2 +1,2 @@
-GPIO = -lwiringPi -lpthread
+GPIO = -lwiringPi -lpthread -lrt -lcrypt -lm
 
